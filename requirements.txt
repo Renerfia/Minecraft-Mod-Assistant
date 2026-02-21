@@ -1,0 +1,6 @@
+customtkinter
+smolagents
+pandas
+requests
+python-dotenv
+litellm
