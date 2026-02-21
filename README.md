@@ -59,20 +59,6 @@ MISTRAL_API_KEY=your_api_key_here
 python app.py
 ```
 
----
-
-## 📦 Building the `.exe` (For Users)
-
-Want to share the app with people who don't know how to code? You can instantly package the entire application into a single, double-clickable Windows `.exe` file!
-
-1. double-click the included `build_app.bat` script.
-2. Wait a minute or two for PyInstaller to compile the code.
-3. Once finished, look inside the newly created `dist/` folder.
-4. Share the **`ModAssistantApp.exe`** file with anyone! 
-
-> **Note:** They will still need a `.env` file with an API key in the same folder as the `.exe` to connect to the AI.
-
----
 
 ## 💡 How to Use
 
