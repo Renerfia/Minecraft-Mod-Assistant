@@ -76,7 +76,6 @@ python app.py
 * **[CustomTkinter](https://github.com/TomSchimansky/CustomTkinter)** - For the gorgeous, responsive desktop UI.
 * **[smolagents](https://github.com/huggingface/smolagents)** - To power the Tool Calling Agent architecture.
 * **[LiteLLM](https://github.com/BerriAI/litellm)** - For seamless integration with the Mistral API.
-* **[PyInstaller](https://pyinstaller.org/en/stable/)** - To bundle the Python script into a native Windows executable.
 
 <div align="center">
   <br>
