@@ -48,18 +48,16 @@ Open your terminal in the project directory and run:
 pip install -r requirements.txt
 ```
 
-### 3. Environment Variables
+### 3. Environment Variables (Important!)
 You need an API key for the AI to function. Create a `.env` file in the root directory and add your Mistral API key:
 ```env
 MISTRAL_API_KEY=your_api_key_here (get api key from: https://docs.mistral.ai)
 ```
 
 ### 4. Run the App
-```bash
-python app.py
-```
+double click app.bat
 
-
+You are done! ( ˶ˆᗜˆ˵ )
 ## 💡 How to Use
 
 1. **Launch** the ModAssistantApp.
@@ -81,4 +79,6 @@ python app.py
 <div align="center">
   <br>
   <i>Built with ❤️ for the Minecraft community.</i>
+  <br>
+  <i>Owner's discord:https://discord.com/users/ryzn_linex</i>
 </div>
