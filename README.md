@@ -20,7 +20,7 @@
 Powered by **Mistral AI** and packaged in a beautiful, modern UI using **CustomTkinter**, this app allows you to research mods, get recommendations, and even automatically download them directly to your computer with a single command.
 
 <p align="center">
-  <img src="./images/Capture.png" alt="UI Inspiration" width="400" style="border-radius: 10px;"/>
+  <img src="./images/Capture.PNG" alt="UI Inspiration" width="400" style="border-radius: 10px;"/>
 </p>
 
 ---
