@@ -57,6 +57,18 @@ class MinecraftModApp(ctk.CTk):
         )
         self.send_button.grid(row=0, column=1, sticky="e")
         
+        # 5. Open Downloads Button
+        self.downloads_button = ctk.CTkButton(
+            self.input_frame, 
+            text="📁 Downloads", 
+            font=("Arial", 14, "bold"),
+            width=120, 
+            height=45,
+            fg_color="#2ba745", hover_color="#2ea043", # Green color for distinguishing it
+            command=self.open_downloads_folder
+        )
+        self.downloads_button.grid(row=0, column=2, padx=(10, 0), sticky="e")
+        
         # Initial greeting from Assistant
         self.add_message("Assistant", "Hello! I am the Minecraft Mod Assistant!\nAsk me about mods or ask me to download them.", is_user=False)
         
@@ -113,6 +125,18 @@ class MinecraftModApp(ctk.CTk):
         if os.name == 'nt':
             # Opens explorer with the file highlighted
             subprocess.run(['explorer', '/select,', filepath])
+
+    def open_downloads_folder(self):
+        """
+        Opens the mods downloads folder in Windows Explorer.
+        """
+        import subprocess
+        downloads_path = os.path.abspath('./mods')
+        if not os.path.exists(downloads_path):
+            os.makedirs(downloads_path, exist_ok=True)
+            
+        if os.name == 'nt':
+            subprocess.run(['explorer', downloads_path])
         
     def send_message(self):
         """

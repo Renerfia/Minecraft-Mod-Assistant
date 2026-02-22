@@ -12,9 +12,17 @@ os.makedirs('./mods', exist_ok=True)
 API_KEY = os.getenv("MISTRAL_API_KEY")
 model = LiteLLMModel(model_id="mistral/mistral-large-2512", api_key=API_KEY)
 
-instructions = """You are a minecraft mod analysis assistant. you will answer the questions based on the following dataset and online research.
-also prioritize the key title,description, downloads, version, category, and link when answering questions about the mods. if you need to do online research, use the mod_info_fn tool to get information about a specific mod.
-if the user asks you to download a mod, use the download_mod_fn tool with the mod's id or slug, game version, and loader. Downloads are automatically saved to the ./mods/ folder on the server. Always provide the user with the downloaded file path. Make sure to ask the user for the necessary information if they haven't provided it."""
+instructions = """
+You are a Minecraft mod assistant. Follow these instructions:
+
+1. Answer questions about mods using the mod_info_fn tool. Always mention the title, description, downloads, version, category, and link.
+2. If the user asks to download a mod, use the download_mod_fn tool. Ask the user for the Minecraft version and mod loader if they haven't provided it.
+3. Write in plain conversational text. Do not use **, ##, ---, or any markdown formatting.
+4. You can use emojis to express yourself naturally.
+5.most user might be new to modding so explain things in a simple and easy to understand way.
+6. if you want present about mod's data by ordering them in a list or table use bullet points or numbered list.
+7. also tell them dependencies if the mod has any.
+"""
 
 
     
@@ -26,11 +34,12 @@ def mod_info_fn(mod_full_name:str)->str:
     Args:
     mod_full_name: The full name of the Minecraft mod you want information about.
     """
-    df = pd.read_json("content.json",encoding="utf-8")
-    df = pd.DataFrame(df["hits"].tolist())  # adjust based on actual JSON structure
-    mod_info = df[df["title"].str.lower() == mod_full_name.lower()]
-    return mod_info.to_string() if not mod_info.empty else f"No information found for mod: {mod_full_name}"
-
+    params = {
+        "query": mod_full_name,
+        "limit": 5
+    }
+    response = requests.get(f"https://api.modrinth.com/v2/search",params=params)
+    return response.json()
 @tool
 def download_mod_fn(mod_id_or_slug: str, game_version: str, loader: str) -> str:
     """
@@ -95,7 +104,7 @@ def download_mod_fn(mod_id_or_slug: str, game_version: str, loader: str) -> str:
 
 
 
-agent = CodeAgent(model=model, tools=[ mod_info_fn, download_mod_fn], instructions=instructions,additional_authorized_imports=["pandas","json",])
+agent = ToolCallingAgent(model=model, tools=[ mod_info_fn, download_mod_fn], instructions=instructions)
 
 history = [] #store the history of interactions with the agent, if needed for context in future interactions
 def ask_agent(question,history=history):
@@ -103,6 +112,6 @@ def ask_agent(question,history=history):
     return str(response)   
 
 if __name__ == "__main__":
-    question = "can you give me the link of wizards of lua?"
+    question = "can you tell me more about fabric api?"
     response = ask_agent(question)
     print("Agent Response:\n", response)

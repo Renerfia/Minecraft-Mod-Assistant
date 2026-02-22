@@ -20,7 +20,7 @@
 Powered by **Mistral AI** and packaged in a beautiful, modern UI using **CustomTkinter**, this app allows you to research mods, get recommendations, and even automatically download them directly to your computer with a single command.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/TomSchimansky/CustomTkinter/master/images/example_1.png" alt="UI Inspiration" width="400" style="border-radius: 10px;"/>
+  <img src="./images/Capture.png" alt="UI Inspiration" width="400" style="border-radius: 10px;"/>
 </p>
 
 ---
@@ -51,7 +51,7 @@ pip install -r requirements.txt
 ### 3. Environment Variables
 You need an API key for the AI to function. Create a `.env` file in the root directory and add your Mistral API key:
 ```env
-MISTRAL_API_KEY=your_api_key_here
+MISTRAL_API_KEY=your_api_key_here (get api key from: https://docs.mistral.ai)
 ```
 
 ### 4. Run the App
