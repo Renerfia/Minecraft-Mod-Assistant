@@ -31,7 +31,7 @@ Powered by **Mistral AI** and packaged in a beautiful, modern UI using **CustomT
 - **📦 Direct Downloading:** Say *"Download sodium for fabric 1.21.1"* and the app fetches and saves the `.jar` file directly to your local `mods/` folder!
 - **🎨 Modern Dark/Light Mode UI:** The app automatically matches your Windows system theme for a seamless, sleek look.
 - **⚡ Multithreaded Performance:** The UI remains snappy and responsive even while the AI is "thinking" or downloading large files.
-- **🏃‍♂️ Standalone Package:** Can be compiled into a single `.exe` file so your friends can use it without needing to install Python.
+
 
 ---
 
@@ -43,13 +43,19 @@ If you want to run the app from the source code, follow these steps:
 Ensure you have Python 3.10 or higher installed.
 
 ### 2. Clone & Install Dependencies
-Open your terminal in the project directory and run:
+Open your terminal in the project directory and run these command gradually:
+```bash
+python -m venv venv 
+```
+```bash
+/venv/Scripts/activate.bat
+```
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 3. Environment Variables (Important!)
-You need an API key for the AI to function. Create a `.env` file in the root directory and add your Mistral API key:
+You need an API key for the AI to function. Create a `.env` file in the root directory and add your Mistral API key with same variable name:
 ```env
 MISTRAL_API_KEY=your_api_key_here (get api key from: https://docs.mistral.ai)
 ```
