@@ -1,38 +1,53 @@
 import os
 from dotenv import load_dotenv
 import pandas as pd
-from smolagents import LiteLLMModel, ToolCallingAgent, tool, CodeAgent
+from smolagents import LiteLLMModel, ToolCallingAgent, tool, CodeAgent, WebSearchTool
 import requests
+import litellm
+import json
 
+litellm._turn_on_debug()
 load_dotenv()
 
 # Ensure mods folder exists for server deployment
 os.makedirs('./mods', exist_ok=True)
 
 API_KEY = os.getenv("MISTRAL_API_KEY")
-model = LiteLLMModel(model_id="mistral/mistral-large-2512", api_key=API_KEY)
+model = LiteLLMModel(model_id="mistral/mistral-large-2512", api_key=API_KEY) #mistral/mistral-large-2512
 
 instructions = """
-You are a Minecraft mod assistant. Follow these instructions:
+You are a Minecraft mod assistant.
 
-1. Answer questions about mods using the mod_info_fn tool. Always mention the title, description, downloads, version, category, and link.
-2. If the user asks to download a mod, use the download_mod_fn tool. Ask the user for the Minecraft version and mod loader if they haven't provided it.
-3. Write in plain conversational text. Do not use **, ##, ---, or any markdown formatting.
-4. You can use emojis to express yourself naturally.
-5.most user might be new to modding so explain things in a simple and easy to understand way.
-6. if you want present about mod's data by ordering them in a list or table use bullet points or numbered list.
-7. also tell them dependencies if the mod has any.
+- Use mod_info_fn to get mod details. If not found, use web search with short keywords only (e.g. "fabric api modrinth").
+- Use download_mod_fn to download mods. Ask for version and loader if not provided.
+- ALWAYS use the exact version the user specifies. Never question or substitute it. The API handles validation.
+- If user asks for the latest version, use mod_info_fn first to find the latest supported version, then download it.
+- Reply in plain conversational text. No markdown, no **, no ##.
+- Use emojis naturally. Keep explanations simple for beginners.
+- Always mention dependencies if a mod has any.
+- Call tools one by one, not in parallel.
+- Reply in plain text only. No asterisks, no bold, no headers, no markdown of any kind. If you use ** or ## you are breaking the rules.
+- CRITICAL: You must call only ONE tool per step. Wait for the result before calling the next tool. Never include more than one tool call in a single response.
 """
+conversation_history = "./conversation_history.json"
+def save_history(history):
+    with open(conversation_history, "w") as f:
+        json.dump(history, f, indent=4)
 
+def load_history():
+    if os.path.exists(conversation_history):
+        with open(conversation_history, "r") as f:
+            return json.load(f)
+    return []
 
     
 @tool
 def mod_info_fn(mod_full_name:str)->str:
     """
-    Docstring for mod_info_fn
+    Docstring for mod_info_fn use this if user wanted to know about a mod's details like description, downloads, version, category, and link. You can also include dependencies if the mod has any.
     
     Args:
-    mod_full_name: The full name of the Minecraft mod you want information about.
+    mod_full_name:only minecraft's mod name like wizards-of-lua(user will give simple name like wizards of lua. you just have to replace '-' instead of space.  ) or HW3198Ve. Do not include the version or mod loader in the name, just the mod's name itself.
     """
     params = {
         "query": mod_full_name,
@@ -48,7 +63,7 @@ def download_mod_fn(mod_id_or_slug: str, game_version: str, loader: str) -> str:
     
     Args:
         mod_id_or_slug: The Modrinth project ID or slug (e.g., 'HW3198Ve' or 'wizards-of-lua').
-        game_version: The target Minecraft version (e.g., '1.21.1').
+        game_version: The target Minecraft version (e.g., '1.21.11').
         loader: The target Mod loader (e.g., 'fabric', 'forge').
     """
     save_directory = './mods'
@@ -68,6 +83,7 @@ def download_mod_fn(mod_id_or_slug: str, game_version: str, loader: str) -> str:
         return f"Failed to fetch versions for mod {mod_id_or_slug}. API Status: {response.status_code}"
     
     versions = response.json()
+    print(f"versions: {versions}")
     if not versions:
         return f"No suitable version found for mod {mod_id_or_slug} on {loader} {game_version}."
         
@@ -104,11 +120,20 @@ def download_mod_fn(mod_id_or_slug: str, game_version: str, loader: str) -> str:
 
 
 
-agent = ToolCallingAgent(model=model, tools=[ mod_info_fn, download_mod_fn], instructions=instructions)
+agent = CodeAgent(
+    model=model,
+    tools=[ mod_info_fn, download_mod_fn, WebSearchTool()],
+    instructions=instructions,
+    #max_tool_threads=1 # Force sequential tool calls to maintain context
+    additional_authorized_imports=["requests", "json", "os", "time","pandas"]
+)
 
-history = [] #store the history of interactions with the agent, if needed for context in future interactions
-def ask_agent(question,history=history):
-    response = agent.run(f"history: {history}\n question: {question}")
+#store the history of interactions with the agent, if needed for context in future interactions
+def ask_agent(question,history=None):
+    history = load_history() if history is None else history
+    response = agent.run(f"history: {history[-5:]}\n user question: {question}")
+    history.append({"user question": question, "Agent response": str(response)})
+    save_history(history)
     return str(response)   
 
 if __name__ == "__main__":

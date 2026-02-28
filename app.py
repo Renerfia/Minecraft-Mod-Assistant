@@ -217,3 +217,4 @@ if __name__ == "__main__":
     # Launch the desktop UI loop
     app = MinecraftModApp()
     app.mainloop()
+    main.save_history([]) # Clear history on exit, or you can choose to save it if you want persistence
